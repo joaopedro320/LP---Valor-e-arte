@@ -50,7 +50,9 @@ Paleta da apresentação comercial (enviada no briefing):
 
 - WhatsApp **(11) 97289-9613** em todos os CTAs, com mensagem padrão.
 - Botão flutuante de WhatsApp fixo no canto direito.
-- **Formulário sem Apps Script:** monta a mensagem com todos os campos preenchidos, abre `obrigado.html` (dispara evento de conversão) e redireciona para o WhatsApp em 3,5 s (com botão manual). O botão de envio nasce desabilitado e só libera quando todos os campos obrigatórios estão válidos (`checkValidity` a cada input/change). Máscara de telefone automática.
+- **Formulário com planilha (Google Apps Script):** o lead é gravado na planilha **Leads | LP Valor e Arte**, depois abre `obrigado.html` (dispara a conversão) e redireciona para o WhatsApp com "Olá, acabei de preencher o formulário no site da Valor e Arte. Aguardo mais informações.". Junto com os campos vão a URL da página, UTMs (source, medium, campaign, term, content), GCLID e FBCLID da primeira visita.
+- **Plano B automático:** enquanto a URL do Web App não for colada em `SHEET_ENDPOINT`, ou se a requisição não sair (sem internet, bloqueio), o formulário volta ao modo antigo e manda a mensagem completa com todos os campos direto pro WhatsApp. Depois de publicar, faça um envio de teste e confira se a linha apareceu na planilha.
+- O botão de envio nasce desabilitado e só libera quando todos os campos obrigatórios estão válidos (`checkValidity` a cada input/change). Máscara de telefone automática.
 - GTM instalado (placeholder) em `index.html` e `obrigado.html`.
 - SEO: title e description com Barueri/São Paulo/marmoraria, canonical, Open Graph completo, Twitter Card, JSON-LD `HomeAndConstructionBusiness` + `FAQPage`, `robots.txt`, `sitemap.xml`, `site.webmanifest`, width/height em todas as imagens, preload da imagem do hero (desktop e mobile).
 - `vercel.json` com cache longo para `/assets` e headers de segurança.
@@ -59,9 +61,29 @@ Paleta da apresentação comercial (enviada no briefing):
 
 ## 5. O que trocar antes de subir
 
+- [ ] **Planilha de leads:** publicar o Apps Script e colar a URL em `assets/js/main.js` (ver seção 5.1).
 - [ ] **GTM:** trocar `GTM-XXXXXXX` em `index.html` (2x) e `obrigado.html` (2x).
 - [ ] **Domínio:** a URL `https://valorearte-lp.vercel.app/` está como placeholder em: canonical, `og:url`, `og:image`, `twitter:image`, JSON-LD (`@id`, `url`, `logo`, `image`), `robots.txt` e `sitemap.xml`. Buscar e substituir pelo domínio final. O site atual da cliente (valorearte.com.br) está no Wix, então definir se a LP vai num subdomínio.
 - [ ] Conferir no GTM as tags de conversão (Google Ads e Meta) amarradas aos eventos abaixo.
+
+### 5.1 Planilha de leads (Apps Script)
+
+Planilha criada: **Leads | LP Valor e Arte**
+https://docs.google.com/spreadsheets/d/1MS4WZ0ZBe7yXFUyJPvSLH-eN4yzRI3jfqOLYk8Mlqb4/edit
+
+Colunas: Data e hora, Nome, WhatsApp, Local da obra, Perfil, O que precisa, Fase da obra, Material, Mensagem, Página, UTM Source, UTM Medium, UTM Campaign, UTM Term, UTM Content, GCLID, FBCLID.
+
+1. Abrir a planilha > **Extensões > Apps Script**.
+2. Apagar o conteúdo do `Code.gs` e colar o arquivo `apps-script/Code.gs` desta pasta. Salvar.
+3. (Opcional) Rodar a função `testeLead` uma vez pelo editor: autoriza o script e grava uma linha de teste na planilha.
+4. **Implantar > Nova implantação > App da Web**. Executar como: **Eu**. Quem pode acessar: **Qualquer pessoa**. Implantar e autorizar.
+5. Copiar a URL que termina em `/exec`.
+6. Em `assets/js/main.js`, trocar `COLE_AQUI_A_URL_DO_WEB_APP` por essa URL (variável `SHEET_ENDPOINT`, no topo do arquivo).
+7. Subir na Vercel e fazer um envio de teste pela LP.
+
+Se depois mudar o `Code.gs`, use **Implantar > Gerenciar implantações > Editar > Nova versão** para manter a mesma URL.
+
+A planilha foi criada no Drive da conta joaopedrosegreto@gmail.com. Se o padrão for deixar no Drive da QH4 ou compartilhar com a cliente, mover ou compartilhar antes de colar a URL (o script fica preso à planilha, então mover não quebra nada).
 
 ## 6. Pendências de briefing (validar com a cliente)
 
@@ -70,7 +92,6 @@ Paleta da apresentação comercial (enviada no briefing):
 - **Cases Rosenbaum, Arruda e Lufe:** textos copiados da apresentação comercial da cliente. Confirmar se pode citar os nomes na LP de anúncio.
 - **Endereço:** não há endereço completo no briefing, só Barueri (fábrica) e Pinheiros (loja). O JSON-LD está só com a cidade. Se ela passar o endereço, completar o `PostalAddress` e o rodapé.
 - **Avaliações:** a nota do Google (3,9) não aparece na LP por estratégia. Não há depoimentos no briefing, então não foi criada seção de depoimentos. Quando a ação de GMN gerar novas avaliações, dá para incluir.
-- **Apps Script:** se a QH4 quiser gravar os leads numa planilha, ligar o webhook no `submit` do `assets/js/main.js` antes do redirecionamento para `obrigado.html`.
 
 ## 7. Eventos de rastreamento (dataLayer)
 
@@ -95,7 +116,9 @@ lp-valor-e-arte/
 ├── sitemap.xml
 ├── site.webmanifest
 ├── vercel.json
+├── .vercelignore      (não sobe README e apps-script pra Vercel)
 ├── README.md
+├── apps-script/Code.gs (script da planilha, colar no Apps Script)
 └── assets/
     ├── css/style.css
     ├── js/main.js
@@ -127,7 +150,9 @@ Fontes do conteúdo: Briefing + Site (Google Forms, respondido por Daniela em 14
 - [x] Botão flutuante de WhatsApp
 - [x] Formulário com botão desabilitado até validar
 - [x] Rodapé "Desenvolvido pro QH4 Growth" com link para @qh4growth
+- [x] Formulário grava na planilha (com plano B direto pro WhatsApp)
 - [x] HTML validado sem erros (html-validate) e JS sem erros no console
 - [x] Testado em 1440px e 390px, sem rolagem horizontal
+- [ ] URL do Apps Script em `SHEET_ENDPOINT`
 - [ ] GTM real
 - [ ] Domínio final
