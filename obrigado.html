@@ -46,7 +46,7 @@
 </main>
 <script>
 (function(){
-  var DEFAULT='Olá, acabei de preencher o formulário no site. Aguardo mais informações.';
+  var DEFAULT='Olá, acabei de preencher o formulário no site da Valor e Arte. Aguardo mais informações.';
   var text=null;
   try{var q=new URLSearchParams(location.search).get('m');if(q)text=q;}catch(e){}
   if(!text){try{text=sessionStorage.getItem('va_wa_text');}catch(e){}}
