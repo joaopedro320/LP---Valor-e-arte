@@ -3,6 +3,19 @@
   'use strict';
   var WA_NUMBER = '5511972899613';
   var WA_DEFAULT = 'Olá! Vim pelo site da Valor e Arte e gostaria de um orçamento.';
+  /* URL do Web App do Google Apps Script (planilha de leads). Ver README, seção "Planilha de leads". */
+  var SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxB0PyAsPx7JESRsSmMAiIlge14Cd-d3hFIoVODDBRtkLjY6RFqj2ppHUyYP2_ehCjCXA/exec';
+  var SHEET_ON = /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(SHEET_ENDPOINT);
+
+  /* Guarda UTMs e IDs de clique da primeira visita para mandar junto com o lead */
+  var TRACK_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
+  var attrib = {};
+  try {
+    var qs = new URLSearchParams(location.search);
+    var saved = JSON.parse(sessionStorage.getItem('va_attrib') || '{}');
+    TRACK_KEYS.forEach(function (k) { attrib[k] = qs.get(k) || saved[k] || ''; });
+    sessionStorage.setItem('va_attrib', JSON.stringify(attrib));
+  } catch (err) { TRACK_KEYS.forEach(function (k) { attrib[k] = attrib[k] || ''; }); }
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.dataLayer = window.dataLayer || [];
   function track(event, data) { var o = { event: event }; for (var k in data) o[k] = data[k]; window.dataLayer.push(o); }
@@ -183,8 +196,44 @@
       if (msg) lines.push('*Mensagem:* ' + msg);
       var text = lines.join('\n');
       track('generate_lead', { form_id: 'orcamento', perfil: fd.get('perfil'), peca: fd.get('peca'), fase: fd.get('fase') });
-      try { sessionStorage.setItem('va_wa_text', text); } catch (err) {}
-      window.location.href = 'obrigado.html?m=' + encodeURIComponent(text);
+
+      /* Sem planilha configurada: mensagem completa vai direto pro WhatsApp */
+      function goFull() {
+        try { sessionStorage.setItem('va_wa_text', text); } catch (err) {}
+        window.location.href = 'obrigado.html?m=' + encodeURIComponent(text);
+      }
+      if (!SHEET_ON) { goFull(); return; }
+
+      /* Com planilha: grava o lead e segue pro obrigado com a mensagem padrão */
+      btn.disabled = true;
+      var label = btn.textContent;
+      btn.textContent = 'Enviando...';
+      var payload = {
+        nome: fd.get('nome'), whatsapp: fd.get('whatsapp'), cidade: fd.get('cidade'),
+        perfil: fd.get('perfil'), peca: fd.get('peca'), fase: fd.get('fase'),
+        material: fd.get('material') || 'Quero orientação', mensagem: msg,
+        pagina: location.href.split('?')[0]
+      };
+      TRACK_KEYS.forEach(function (k) { payload[k] = attrib[k] || ''; });
+      var done = false;
+      function goSheet() {
+        if (done) return; done = true;
+        try { sessionStorage.removeItem('va_wa_text'); } catch (err) {}
+        window.location.href = 'obrigado.html';
+      }
+      function fail() {
+        if (done) return; done = true;
+        btn.textContent = label;
+        goFull();
+      }
+      try {
+        fetch(SHEET_ENDPOINT, {
+          method: 'POST', mode: 'no-cors', keepalive: true,
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        }).then(goSheet, fail);
+        setTimeout(goSheet, 4000);
+      } catch (err) { fail(); }
     });
   }
 })();
