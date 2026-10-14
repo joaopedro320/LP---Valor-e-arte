@@ -1,0 +1,13 @@
+{
+  "name": "Valor e Arte Marmoraria",
+  "short_name": "Valor e Arte",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#A5542E",
+  "theme_color": "#A5542E",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

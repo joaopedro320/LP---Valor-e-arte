@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recebemos seu pedido | Valor e Arte Marmoraria</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#A5542E">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/icon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@300;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.ty{min-height:100svh;display:grid;place-items:center;background:var(--terra);color:#fff;padding:40px 20px;position:relative;overflow:hidden}
+.ty::before{content:"";position:absolute;inset:0;background:url(assets/img/textura-marmore.webp) center/cover;opacity:.12}
+.ty svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ty svg.lines line{stroke:#fff;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s var(--ease) forwards}
+.ty__box{position:relative;max-width:560px;text-align:left}
+.ty__box img{width:170px;margin-bottom:2.4rem}
+.ty h1{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:300;margin-bottom:1rem}
+.ty h1 b{font-weight:800;display:block}
+.ty p{opacity:.92;margin-bottom:1.8rem}
+.ty__bar{height:3px;background:rgba(255,255,255,.25);margin:0 0 1.6rem;overflow:hidden}
+.ty__bar span{display:block;height:100%;background:var(--sand);width:0;animation:fill 3.5s linear forwards}
+@keyframes fill{to{width:100%}}
+.ty a.back{display:inline-block;margin-top:1.4rem;font-size:.9rem;color:#fff;opacity:.85}
+</style>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+</head>
+<body>
+<noscript><iframe title="Google Tag Manager" src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<main class="ty on-dark">
+  <svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="72" y1="-2" x2="86" y2="102" pathLength="1" vector-effect="non-scaling-stroke" style="stroke-width:3px"/>
+    <line x1="92" y1="102" x2="104" y2="-2" pathLength="1" vector-effect="non-scaling-stroke" style="stroke-width:1.5px"/>
+  </svg>
+  <div class="ty__box">
+    <img src="assets/img/logo-white.png" alt="Valor e Arte Mármores e Superfícies" width="531" height="171">
+    <h1>Recebemos seu pedido. <b>Agora é só enviar.</b></h1>
+    <p>Estamos abrindo o WhatsApp da Valor e Arte com as informações do seu projeto. É só tocar em enviar para nossa equipe dar sequência ao seu orçamento.</p>
+    <div class="ty__bar" aria-hidden="true"><span></span></div>
+    <a class="btn btn--sand" id="wa-go" href="https://wa.me/5511972899613" rel="noopener">Abrir o WhatsApp agora</a>
+    <br><a class="back" href="./">Voltar ao site</a>
+  </div>
+</main>
+<script>
+(function(){
+  var DEFAULT='Olá, acabei de preencher o formulário no site. Aguardo mais informações.';
+  var text=null;
+  try{var q=new URLSearchParams(location.search).get('m');if(q)text=q;}catch(e){}
+  if(!text){try{text=sessionStorage.getItem('va_wa_text');}catch(e){}}
+  if(!text)text=DEFAULT;
+  var url='https://wa.me/5511972899613?text='+encodeURIComponent(text);
+  document.getElementById('wa-go').href=url;
+  window.dataLayer=window.dataLayer||[];
+  window.dataLayer.push({event:'lead_thankyou_view',form_id:'orcamento'});
+  setTimeout(function(){window.location.href=url;},3500);
+})();
+</script>
+</body>
+</html>
